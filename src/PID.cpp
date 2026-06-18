@@ -10,19 +10,26 @@ void PID(double target, double maxIntegral, double tolerance){
   double integral = 0;
   double lastError = error;
   double total = 0;
-
   double kP = 0;
   double kI = 0;
   double kD = 0;
-
+  const double gearRatio = 5.0/3;
+  const double wheelDiameter = 3.25;
+  double wheelRotation = M_PI*wheelDiameter;
+  error = target - (3.25*M_PI*wheelRotation);
+  double rev = wheelDiameter;
+  double proportional = kP*error;
   //Main loop, when the robot is more than the desired distance from the target
-  while(/*Condition here*/){
+  while(error > tolerance){
+
+
+    double measuredValue = 1/360 * 3.25/1 * gearRatio;
+    double target = error + measuredValue; 
 
     //Calculate how far the robot is from the target
-    
-
 
     //Find integral value
+
 
     
     //Prevent integral windup by capping the maximum integral value
@@ -46,6 +53,7 @@ void PID(double target, double maxIntegral, double tolerance){
 
 
     //Short wait to save resources
+
     wait(15, msec);
   }
   //Brake motors after driving is finished
