@@ -1,7 +1,7 @@
 #include "PID.h"
 #include "vex.h"
 
-void PID(double target, double maxIntegral, double tolerance){
+void PID(double target, double maxIntegral, double tolerance) {
   double error = target;
 
   double derivative = 0;
@@ -12,38 +12,25 @@ void PID(double target, double maxIntegral, double tolerance){
   double kI = 0.5;
   double kD = 0.05;
   inertialSensor.setRotation(0, degrees);
-  const double gearRatio = 5.0/3;
+  const double gearRatio = 5.0 / 3;
   const double wheelDiameter = 3.25;
-  const double deltaT  = 0.015;
-  double wheelRotation = M_PI*wheelDiameter;
-  //Main loop, when the robot is more than the desired distance from the target
-  while(fabs(error) > tolerance){
-
-    
-    //Calculate how far the robot is from the target
-    double sensorValue = (inertialSensor.rotation(degrees) / 360) * wheelRotation / gearRatio;
+  const double deltaT = 0.015;
+  double wheelRotation = M_PI * wheelDiameter;
+  while (fabs(error) > tolerance) {
+    double sensorValue =
+        (inertialSensor.rotation(degrees) / 360) * wheelRotation / gearRatio;
     error = target - sensorValue;
-    //Find integral value
     integral += error * deltaT;
-    
-    //Prevent integral windup by capping the maximum integral value
-    if (integral > maxIntegral){
+
+    if (integral > maxIntegral) {
       integral = maxIntegral;
-    }
-    else if (integral < -maxIntegral){
-
+    } else if (integral < -maxIntegral) {
     }
 
-
-    //Find derivative value
-    derivative = (error-lastError)/ deltaT;
+    derivative = (error - lastError) / deltaT;
     lastError = error;
-    
-    
-    
-    //Calculate the target speed for the drivetrain
-    total = kP*error + kI*integral + kD* derivative;
-    //Spin drivetrain at the target speed
+
+    total = kP * error + kI * integral + kD * derivative;
     LeftBack.spin(forward, total, percent);
     RightBack.spin(reverse, total, percent);
     LeftFront.spin(forward, total, percent);
@@ -51,18 +38,13 @@ void PID(double target, double maxIntegral, double tolerance){
     LeftMiddle.spin(forward, total, percent);
     RightMiddle.spin(reverse, total, percent);
 
-
-    //Short wait to save resources
-
-    wait(15, msec); 
+    wait(15, msec);
   }
-  //Brake motors after driving is finished
   LeftBack.stop(brake);
   RightBack.stop(brake);
   RightFront.stop(brake);
   LeftFront.stop(brake);
   LeftMiddle.stop(brake);
   RightMiddle.stop(brake);
-  //Short delay to come to a full stop
   wait(50, msec);
 }
